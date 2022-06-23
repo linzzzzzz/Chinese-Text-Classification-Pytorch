@@ -6,6 +6,9 @@ from train_eval import train, init_network
 from importlib import import_module
 import argparse
 
+from ray import tune
+from ray.tune.schedulers import ASHAScheduler
+
 parser = argparse.ArgumentParser(description='Chinese Text Classification')
 parser.add_argument('--model', type=str, required=True, help='choose a model: TextCNN, TextRNN, FastText, TextRCNN, TextRNN_Att, DPCNN, Transformer')
 parser.add_argument('--embedding', default='pre_trained', type=str, help='random or pre_trained')
