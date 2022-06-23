@@ -6,6 +6,7 @@ import pickle as pkl
 from tqdm import tqdm
 import time
 from datetime import timedelta
+import jieba
 
 
 MAX_VOCAB_SIZE = 10000  # 词表长度限制
