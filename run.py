@@ -15,7 +15,7 @@ parser.add_argument('--embedding', default='pre_trained', type=str, help='random
 parser.add_argument('--word', default=False, type=bool, help='True for word, False for char')
 parser.add_argument('--tune_param', default=False, type=bool, help='True for param tuning')
 parser.add_argument('--tune_samples', default=50, type=int, help='Number of tuning experiments to run')
-parser.add_argument('--tune_asha', default=True, type=bool, help='If use ASHA scheduler for early stopping')
+parser.add_argument('--tune_asha', default=False, type=bool, help='If use ASHA scheduler for early stopping')
 parser.add_argument('--tune_file', default='', type=str, help='Suffix of filename for parameter tuning results')
 parser.add_argument('--tune_gpu', default=False, type=int, help='Use GPU to tune parameters')
 args = parser.parse_args()
