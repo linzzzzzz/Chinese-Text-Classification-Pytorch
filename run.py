@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     # if tune parameters
     if args.tune_param:
-        analysis = tune.run(experiment, num_samples=100, config=search_space, resources_per_trial={'gpu',1},
+        analysis = tune.run(experiment, num_samples=100, config=search_space, resources_per_trial={'gpu':1},
             verbose=3)
     # if not tune parameters
     else:
