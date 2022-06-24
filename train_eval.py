@@ -118,14 +118,14 @@ def evaluate(config, model, data_iter, test=False, tune_param=False):
             labels_all = np.append(labels_all, labels)
             predict_all = np.append(predict_all, predic)
 
-    acc = metrics.accuracy_score(labels_all, predict_all)
+    metric = metrics.accuracy_score(labels_all, predict_all)
 
     if tune_param:
-        tune.report(acc=acc)
+        tune.report(metric=metric)
 
 
     if test:
         report = metrics.classification_report(labels_all, predict_all, target_names=config.class_list, digits=4)
         confusion = metrics.confusion_matrix(labels_all, predict_all)
         return acc, loss_total / len(data_iter), report, confusion
-    return acc, loss_total / len(data_iter)
+    return metric, loss_total / len(data_iter)
