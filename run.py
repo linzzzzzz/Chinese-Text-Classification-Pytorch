@@ -15,12 +15,17 @@ parser.add_argument('--embedding', default='pre_trained', type=str, help='random
 parser.add_argument('--word', default=False, type=bool, help='True for word, False for char')
 parser.add_argument('--tune_param', default=False, type=bool, help='True for param tuning')
 parser.add_argument('--tune_samples', default=50, type=int, help='Number of tuning experiments to run')
+parser.add_argument('--tune_asha', default=True, type=bool, help='If use ASHA scheduler for early stopping')
 parser.add_argument('--tune_file', default='', type=str, help='Suffix of filename for parameter tuning results')
 args = parser.parse_args()
 
 
 search_space = {
     'learning_rate': tune.loguniform(1e-5, 1e-2),
+    'num_epochs': tune.randint(5, 21),
+    'dropout': tune.uniform(0, 0.5),
+    'hidden_size': tune.randint(32, 257),
+    'num_layers': tune.randint(1,3)
 }
 
 
@@ -79,7 +84,10 @@ if __name__ == '__main__':
 
     # if tune parameters
     if args.tune_param:
+        scheduler = ASHAScheduler(metric='metric', mode="max") if args.tune_asha else None
+        
         analysis = tune.run(experiment, num_samples=args.tune_samples, config=search_space, resources_per_trial={'gpu':1},
+            scheduler=scheduler
             verbose=3)
         analysis.results_df.to_csv('tune_results_'+args.tune_file+'.csv')
     # if not tune parameters
