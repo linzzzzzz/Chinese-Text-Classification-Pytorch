@@ -14,6 +14,8 @@ parser.add_argument('--model', type=str, required=True, help='choose a model: Te
 parser.add_argument('--embedding', default='pre_trained', type=str, help='random or pre_trained')
 parser.add_argument('--word', default=False, type=bool, help='True for word, False for char')
 parser.add_argument('--tune_param', default=False, type=bool, help='True for param tuning')
+parser.add_argument('--tune_samples', default=50, type=int, help='Number of tuning experiments to run')
+parser.add_argument('--tune_file', default='', type=str, help='Suffix of filename for parameter tuning results')
 args = parser.parse_args()
 
 
@@ -75,8 +77,9 @@ if __name__ == '__main__':
 
     # if tune parameters
     if args.tune_param:
-        analysis = tune.run(experiment, num_samples=100, config=search_space, resources_per_trial={'gpu':1},
+        analysis = tune.run(experiment, num_samples=args.tune_samples, config=search_space, resources_per_trial={'gpu':1},
             verbose=3)
+        analysis.results_df.to_csv('tune_results_'+args.tune_file+'.csv')
     # if not tune parameters
     else:
         experiment(tune_config=None)
