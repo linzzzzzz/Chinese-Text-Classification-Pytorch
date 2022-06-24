@@ -69,10 +69,12 @@ if __name__ == '__main__':
         if model_name != 'Transformer':
             init_network(model)
         print(model.parameters)
-        res = train(config, model, train_iter, dev_iter, test_iter)
 
         if tune_config:
+            res = train(config, model, train_iter, dev_iter, test_iter, tune_param=True)
             tune.report(metric=res)
+        else:
+            train(config, model, train_iter, dev_iter, test_iter, tune_param=False)
 
 
     # if tune parameters
