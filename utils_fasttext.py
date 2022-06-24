@@ -30,7 +30,7 @@ def build_vocab(file_path, tokenizer, max_size, min_freq):
 
 def build_dataset(config, ues_word):
     if ues_word:
-        tokenizer = lambda x: x.split(' ')  # 以空格隔开，word-level
+        tokenizer = lambda x: jieba.lcut(x)  # use Jieba 分词
     else:
         tokenizer = lambda x: [y for y in x]  # char-level
     if os.path.exists(config.vocab_path):

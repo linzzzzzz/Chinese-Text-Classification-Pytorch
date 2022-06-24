@@ -8,6 +8,8 @@ import time
 from utils import get_time_dif
 from tensorboardX import SummaryWriter
 
+from ray import tune
+
 
 # 权重初始化，默认xavier
 def init_network(model, method='xavier', exclude='embedding', seed=123):
@@ -26,7 +28,7 @@ def init_network(model, method='xavier', exclude='embedding', seed=123):
                 pass
 
 
-def train(config, model, train_iter, dev_iter, test_iter):
+def train(config, model, train_iter, dev_iter, test_iter, tune_param=False):
     start_time = time.time()
     model.train()
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
@@ -52,7 +54,7 @@ def train(config, model, train_iter, dev_iter, test_iter):
                 true = labels.data.cpu()
                 predic = torch.max(outputs.data, 1)[1].cpu()
                 train_acc = metrics.accuracy_score(true, predic)
-                dev_acc, dev_loss = evaluate(config, model, dev_iter)
+                dev_acc, dev_loss = evaluate(config, model, dev_iter, tune_param=tune_param)
                 if dev_loss < dev_best_loss:
                     dev_best_loss = dev_loss
                     torch.save(model.state_dict(), config.save_path)
@@ -77,15 +79,18 @@ def train(config, model, train_iter, dev_iter, test_iter):
         if flag:
             break
     writer.close()
-    test(config, model, test_iter)
+
+    print('Conducting model evaluation on test set.....')
+    res = test(config, model, test_iter, tune_param=tune_param)
+    return res
 
 
-def test(config, model, test_iter):
+def test(config, model, test_iter, tune_param=False):
     # test
     model.load_state_dict(torch.load(config.save_path))
     model.eval()
     start_time = time.time()
-    test_acc, test_loss, test_report, test_confusion = evaluate(config, model, test_iter, test=True)
+    test_acc, test_loss, test_report, test_confusion = evaluate(config, model, test_iter, test=True, tune_param=tune_param)
     msg = 'Test Loss: {0:>5.2},  Test Acc: {1:>6.2%}'
     print(msg.format(test_loss, test_acc))
     print("Precision, Recall and F1-Score...")
@@ -95,8 +100,10 @@ def test(config, model, test_iter):
     time_dif = get_time_dif(start_time)
     print("Time usage:", time_dif)
 
+    return test_acc
 
-def evaluate(config, model, data_iter, test=False):
+
+def evaluate(config, model, data_iter, test=False, tune_param=False):
     model.eval()
     loss_total = 0
     predict_all = np.array([], dtype=int)
@@ -112,6 +119,11 @@ def evaluate(config, model, data_iter, test=False):
             predict_all = np.append(predict_all, predic)
 
     acc = metrics.accuracy_score(labels_all, predict_all)
+
+    if tune_param:
+        tune.report(acc=acc)
+
+
     if test:
         report = metrics.classification_report(labels_all, predict_all, target_names=config.class_list, digits=4)
         confusion = metrics.confusion_matrix(labels_all, predict_all)
