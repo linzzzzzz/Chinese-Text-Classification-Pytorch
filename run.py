@@ -17,6 +17,7 @@ parser.add_argument('--tune_param', default=False, type=bool, help='True for par
 parser.add_argument('--tune_samples', default=50, type=int, help='Number of tuning experiments to run')
 parser.add_argument('--tune_asha', default=True, type=bool, help='If use ASHA scheduler for early stopping')
 parser.add_argument('--tune_file', default='', type=str, help='Suffix of filename for parameter tuning results')
+parser.add_argument('--tune_gpu', default=False, type=int, help='Use GPU to tune parameters')
 args = parser.parse_args()
 
 
@@ -86,7 +87,7 @@ if __name__ == '__main__':
     if args.tune_param:
         scheduler = ASHAScheduler(metric='metric', mode="max") if args.tune_asha else None
         
-        analysis = tune.run(experiment, num_samples=args.tune_samples, config=search_space, resources_per_trial={'gpu':1},
+        analysis = tune.run(experiment, num_samples=args.tune_samples, config=search_space, resources_per_trial={'gpu':int(args.tune_gpu)},
             scheduler=scheduler,
             verbose=3)
         analysis.results_df.to_csv('tune_results_'+args.tune_file+'.csv')
