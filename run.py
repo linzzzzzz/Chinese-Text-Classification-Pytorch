@@ -87,7 +87,7 @@ if __name__ == '__main__':
         scheduler = ASHAScheduler(metric='metric', mode="max") if args.tune_asha else None
         
         analysis = tune.run(experiment, num_samples=args.tune_samples, config=search_space, resources_per_trial={'gpu':1},
-            scheduler=scheduler
+            scheduler=scheduler,
             verbose=3)
         analysis.results_df.to_csv('tune_results_'+args.tune_file+'.csv')
     # if not tune parameters
