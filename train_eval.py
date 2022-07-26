@@ -92,7 +92,7 @@ def test(config, model, test_iter, tune_param=False):
     start_time = time.time()
     test_metric, test_loss, test_report, test_confusion = evaluate(config, model, test_iter, test=True, tune_param=tune_param)
     msg = 'Test Loss: {0:>5.2},  Test Acc: {1:>6.2%}'
-    print(msg.format(test_loss, test_acc))
+    print(msg.format(test_loss, test_metric))
     print("Precision, Recall and F1-Score...")
     print(test_report)
     print("Confusion Matrix...")

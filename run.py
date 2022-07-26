@@ -17,13 +17,13 @@ parser.add_argument('--tune_param', default=False, type=bool, help='True for par
 parser.add_argument('--tune_samples', default=50, type=int, help='Number of tuning experiments to run')
 parser.add_argument('--tune_asha', default=False, type=bool, help='If use ASHA scheduler for early stopping')
 parser.add_argument('--tune_file', default='', type=str, help='Suffix of filename for parameter tuning results')
-parser.add_argument('--tune_gpu', default=False, type=int, help='Use GPU to tune parameters')
+parser.add_argument('--tune_gpu', default=False, type=bool, help='Use GPU to tune parameters')
 args = parser.parse_args()
 
 
 search_space = {
     'learning_rate': tune.loguniform(1e-5, 1e-2),
-    'num_epochs': tune.randint(5, 21),
+    'num_epochs': tune.randint(2, 3),
     'dropout': tune.uniform(0, 0.5),
     'hidden_size': tune.randint(32, 257),
     'num_layers': tune.randint(1,3)
