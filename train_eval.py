@@ -6,9 +6,10 @@ import torch.nn.functional as F
 from sklearn import metrics
 import time
 from utils import get_time_dif
-from tensorboardX import SummaryWriter
+# from tensorboardX import SummaryWriter
 
 from ray import tune
+from pytorch_pretrained.optimization import BertAdam
 
 
 # 权重初始化，默认xavier
@@ -28,10 +29,22 @@ def init_network(model, method='xavier', exclude='embedding', seed=123):
                 pass
 
 
-def train(config, model, train_iter, dev_iter, test_iter, tune_param=False):
+def train(config, model, train_iter, dev_iter, test_iter, model_group, tune_param=False):
     start_time = time.time()
     model.train()
-    optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
+    if model_group == 1:
+        optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
+    elif model_group == 2:
+        param_optimizer = list(model.named_parameters())
+        no_decay = ['bias', 'LayerNorm.bias', 'LayerNorm.weight']
+        optimizer_grouped_parameters = [
+            {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)], 'weight_decay': 0.01},
+            {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay': 0.0}]
+        # optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
+        optimizer = BertAdam(optimizer_grouped_parameters,
+                             lr=config.learning_rate,
+                             warmup=0.05,
+                             t_total=len(train_iter) * config.num_epochs)
 
     # 学习率指数衰减，每次epoch：学习率 = gamma * 学习率
     # scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.9)
@@ -39,7 +52,7 @@ def train(config, model, train_iter, dev_iter, test_iter, tune_param=False):
     dev_best_loss = float('inf')
     last_improve = 0  # 记录上次验证集loss下降的batch数
     flag = False  # 记录是否很久没有效果提升
-    writer = SummaryWriter(log_dir=config.log_path + '/' + time.strftime('%m-%d_%H.%M', time.localtime()))
+    # writer = SummaryWriter(log_dir=config.log_path + '/' + time.strftime('%m-%d_%H.%M', time.localtime()))
     for epoch in range(config.num_epochs):
         print('Epoch [{}/{}]'.format(epoch + 1, config.num_epochs))
         # scheduler.step() # 学习率衰减
@@ -65,10 +78,10 @@ def train(config, model, train_iter, dev_iter, test_iter, tune_param=False):
                 time_dif = get_time_dif(start_time)
                 msg = 'Iter: {0:>6},  Train Loss: {1:>5.2},  Train Acc: {2:>6.2%},  Val Loss: {3:>5.2},  Val Acc: {4:>6.2%},  Time: {5} {6}'
                 print(msg.format(total_batch, loss.item(), train_acc, dev_loss, dev_acc, time_dif, improve))
-                writer.add_scalar("loss/train", loss.item(), total_batch)
-                writer.add_scalar("loss/dev", dev_loss, total_batch)
-                writer.add_scalar("acc/train", train_acc, total_batch)
-                writer.add_scalar("acc/dev", dev_acc, total_batch)
+                # writer.add_scalar("loss/train", loss.item(), total_batch)
+                # writer.add_scalar("loss/dev", dev_loss, total_batch)
+                # writer.add_scalar("acc/train", train_acc, total_batch)
+                # writer.add_scalar("acc/dev", dev_acc, total_batch)
                 model.train()
             total_batch += 1
             if total_batch - last_improve > config.require_improvement:
@@ -78,7 +91,7 @@ def train(config, model, train_iter, dev_iter, test_iter, tune_param=False):
                 break
         if flag:
             break
-    writer.close()
+    # writer.close()
 
     print('Conducting model evaluation on test set.....')
     res = test(config, model, test_iter, tune_param=tune_param)
