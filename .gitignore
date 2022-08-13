@@ -6,7 +6,7 @@
 *.feather
 .DS_Store
 .idea
-__pycache__/
+*__pycache__*
 *.pyc
 *.html
 *.zip
@@ -14,3 +14,4 @@ __pycache__/
 *.xlsx
 *.war
 *.jar
+*ipynb_checkpoints*
