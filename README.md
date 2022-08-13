@@ -3,6 +3,8 @@
 
 中文文本分类，TextCNN，TextRNN，FastText，TextRCNN，BiLSTM_Attention, DPCNN, Transformer, 基于pytorch，开箱即用。
 
+现也已加入对Bert的支持。
+
 基于ray.tune实现了对不同模型进行超参数优化的功能。简单易用。
 
 ## 环境
@@ -15,7 +17,11 @@ tensorboardX
 
 ## 使用说明
 第一步：安装`ray` - `pip install ray`  
+
 第二步：选定要做超参数优化的模型: 如`TextRNN`  
+(Bert需要参照[此处](https://github.com/linzzzzzz/Chinese-Text-Classification-Pytorch-Tuning/tree/master/bert_pretrain)额外下载文件，不用Bert可跳过）
+
+
 第三步：根据第二步选中的模型，在run.py中设定相关超参数的search_space。具体的语法可参照[这里](https://docs.ray.io/en/latest/tune/api_docs/search_space.html)。如
 ```
 search_space = {
@@ -26,6 +32,8 @@ search_space = {
     'num_layers': tune.randint(1,3)
 }
 ```
+*此处请注意确认相关参数是否适用于选择的模型，否则会报错*
+
 第四步：启动50次超参数优化实验
 ```
 python run.py --model TextCNN --tune_param True --tune_samples 50 
@@ -38,6 +46,9 @@ python run.py --model TextCNN --tune_param True --tune_samples 50
 ```
 # 使用GPU
 python run.py --model TextRNN --tune_param True --tune_gpu True
+
+# 使用Bert
+python run.py --model bert --tune_param True --tune_gpu True
 
 # 自定义实验结果文件后缀名
 python run.py --model TextRNN --tune_param True --tune_file rnn_char
