@@ -71,7 +71,10 @@ if __name__ == '__main__':
 
     def experiment(tune_config):
         x = import_module('models.' + model_name)
-        config = x.Config(dataset, embedding)
+        if model_group == 1:
+            config = x.Config(dataset, embedding)
+        elif model_group == 2:
+            config = x.Config(dataset)
 
         if tune_config:
             for param in tune_config:
