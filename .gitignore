@@ -1,0 +1,16 @@
+*.log
+*.hdf
+*.pkl
+*.pickle
+*.csv
+*.feather
+.DS_Store
+.idea
+__pycache__/
+*.pyc
+*.html
+*.zip
+*.pdf
+*.xlsx
+*.war
+*.jar
