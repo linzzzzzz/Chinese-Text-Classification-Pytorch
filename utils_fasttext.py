@@ -41,28 +41,18 @@ def build_dataset(config, ues_word):
     print(f"Vocab size: {len(vocab)}")
 
     def biGramHash(sequence, t, buckets):
-        if t - 1 >= 0:
-            t1 = sequence[t - 1]
-            return (t1 * 14918087) % buckets
-        else:
-            return None
+        t1 = sequence[t - 1] if t - 1 >= 0 else 0
+        return (t1 * 14918087) % buckets
 
     # def biGramVocab(seq, seq_chr, t, buckets):
     #     t1 = sequence[t - 1] if t - 1 >= 0 else 0
     #     vocab[] = (t1 * 14918087) % buckets
 
-    # def triGramHash(sequence, t, buckets):
-    #     t1 = sequence[t - 1] if t - 1 >= 0 else 0
-    #     t2 = sequence[t - 2] if t - 2 >= 0 else 0
-    #     return (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
-
     def triGramHash(sequence, t, buckets):
-        if t - 2 >= 0:
-            t1 = sequence[t - 1]
-            t2 = sequence[t - 2]
-            return (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
-        else:
-            return None
+        t1 = sequence[t - 1] if t - 1 >= 0 else 0
+        t2 = sequence[t - 2] if t - 2 >= 0 else 0
+        return (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
+
 
     def load_dataset(path, pad_size=32):
         contents = []
