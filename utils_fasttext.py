@@ -41,13 +41,28 @@ def build_dataset(config, ues_word):
     print(f"Vocab size: {len(vocab)}")
 
     def biGramHash(sequence, t, buckets):
-        t1 = sequence[t - 1] if t - 1 >= 0 else 0
-        return (t1 * 14918087) % buckets
+        if t - 1 >= 0:
+            t1 = sequence[t - 1]
+            return (t1 * 14918087) % buckets
+        else:
+            return None
+
+    # def biGramVocab(seq, seq_chr, t, buckets):
+    #     t1 = sequence[t - 1] if t - 1 >= 0 else 0
+    #     vocab[] = (t1 * 14918087) % buckets
+
+    # def triGramHash(sequence, t, buckets):
+    #     t1 = sequence[t - 1] if t - 1 >= 0 else 0
+    #     t2 = sequence[t - 2] if t - 2 >= 0 else 0
+    #     return (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
 
     def triGramHash(sequence, t, buckets):
-        t1 = sequence[t - 1] if t - 1 >= 0 else 0
-        t2 = sequence[t - 2] if t - 2 >= 0 else 0
-        return (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
+        if t - 2 >= 0:
+            t1 = sequence[t - 1]
+            t2 = sequence[t - 2]
+            return (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
+        else:
+            return None
 
     def load_dataset(path, pad_size=32):
         contents = []
@@ -58,6 +73,7 @@ def build_dataset(config, ues_word):
                     continue
                 content, label = lin.split('\t')
                 words_line = []
+                words_line_chr = []
                 token = tokenizer(content)
                 seq_len = len(token)
                 if pad_size:
@@ -69,6 +85,7 @@ def build_dataset(config, ues_word):
                 # word to id
                 for word in token:
                     words_line.append(vocab.get(word, vocab.get(UNK)))
+                    words_line_chr.append(word)
 
                 # fasttext ngram
                 buckets = config.n_gram_vocab
@@ -76,8 +93,12 @@ def build_dataset(config, ues_word):
                 trigram = []
                 # ------ngram------
                 for i in range(pad_size):
-                    bigram.append(biGramHash(words_line, i, buckets))
-                    trigram.append(triGramHash(words_line, i, buckets))
+                    bi = biGramHash(words_line, i, buckets)
+                    if bi is not None:
+                        bigram.append(bi)
+                    tri = triGramHash(words_line, i, buckets)
+                    if tri is not None:
+                        trigram.append(tri)
                 # -----------------
                 contents.append((words_line, int(label), seq_len, bigram, trigram))
         return contents  # [([...], 0), ([...], 1), ...]
