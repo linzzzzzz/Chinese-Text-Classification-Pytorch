@@ -46,7 +46,7 @@ def build_dataset(config, ues_word):
 
     def biGramVocab(seq, seq_chr, t, buckets):
         t1 = sequence[t - 1] if t - 1 >= 0 else 0
-        if t - 1 >= 0
+        if t - 1 >= 0:
             bi_chr = seq_chr[t-1]+seq_chr[t]
             if bi_chr not in vocab:
                 vocab[bi_chr] = (t1 * 14918087) % buckets
