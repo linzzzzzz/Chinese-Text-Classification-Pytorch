@@ -44,25 +44,25 @@ def build_dataset(config, ues_word):
         t1 = sequence[t - 1] if t - 1 >= 0 else 0
         return (t1 * 14918087) % buckets
 
-    def biGramVocab(sequence, seq_chr, t, buckets):
-        t1 = sequence[t - 1] if t - 1 >= 0 else 0
-        if t - 1 >= 0:
-            bi_chr = seq_chr[t-1]+seq_chr[t]
-            if bi_chr not in vocab:
-                vocab[bi_chr] = (t1 * 14918087) % buckets
+    # def biGramVocab(sequence, seq_chr, t, buckets):
+    #     t1 = sequence[t - 1] if t - 1 >= 0 else 0
+    #     if t - 1 >= 0:
+    #         bi_chr = seq_chr[t-1]+seq_chr[t]
+    #         if bi_chr not in vocab:
+    #             vocab[bi_chr] = (t1 * 14918087) % buckets
 
     def triGramHash(sequence, t, buckets):
         t1 = sequence[t - 1] if t - 1 >= 0 else 0
         t2 = sequence[t - 2] if t - 2 >= 0 else 0
         return (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
 
-    def triGramVocab(sequence, seq_chr, t, buckets):
-        t1 = sequence[t - 1] if t - 1 >= 0 else 0
-        t2 = sequence[t - 2] if t - 2 >= 0 else 0
-        if t - 2 >= 0:
-            tri_chr = seq_chr[t-2]+seq_chr[t-1]+seq_chr[t]
-            if tri_chr not in vocab:
-                vocab[tri_chr] = (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
+    # def triGramVocab(sequence, seq_chr, t, buckets):
+    #     t1 = sequence[t - 1] if t - 1 >= 0 else 0
+    #     t2 = sequence[t - 2] if t - 2 >= 0 else 0
+    #     if t - 2 >= 0:
+    #         tri_chr = seq_chr[t-2]+seq_chr[t-1]+seq_chr[t]
+    #         if tri_chr not in vocab:
+    #             vocab[tri_chr] = (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
 
 
     def load_dataset(path, pad_size=32):
@@ -86,7 +86,7 @@ def build_dataset(config, ues_word):
                 # word to id
                 for word in token:
                     words_line.append(vocab.get(word, vocab.get(UNK)))
-                    words_line_chr.append(word)
+                    # words_line_chr.append(word)
 
                 # fasttext ngram
                 buckets = config.n_gram_vocab
@@ -95,9 +95,9 @@ def build_dataset(config, ues_word):
                 # ------ngram------
                 for i in range(pad_size):
                     bigram.append(biGramHash(words_line, i, buckets))
-                    biGramVocab(words_line, words_line_chr, i, buckets)
+                    # biGramVocab(words_line, words_line_chr, i, buckets)
                     trigram.append(triGramHash(words_line, i, buckets))
-                    triGramVocab(words_line, words_line_chr, i, buckets)
+                    # triGramVocab(words_line, words_line_chr, i, buckets)
                 # -----------------
                 contents.append((words_line, int(label), seq_len, bigram, trigram))
         return contents  # [([...], 0), ([...], 1), ...]
