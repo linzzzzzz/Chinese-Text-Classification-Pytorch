@@ -48,6 +48,7 @@ class Model(nn.Module):
         super(Model, self).__init__()
         if config.embedding_pretrained is not None:
             self.embedding = nn.Embedding.from_pretrained(config.embedding_pretrained, freeze=False)
+            print('loaded pretrained FastText weights')
         else:
             self.embedding = nn.Embedding(config.n_vocab, config.embed, padding_idx=config.n_vocab - 1)
         self.embedding_ngram2 = nn.Embedding(config.n_gram_vocab, config.embed)
