@@ -44,7 +44,7 @@ def build_dataset(config, ues_word):
         t1 = sequence[t - 1] if t - 1 >= 0 else 0
         return (t1 * 14918087) % buckets
 
-    def biGramVocab(seq, seq_chr, t, buckets):
+    def biGramVocab(sequence, seq_chr, t, buckets):
         t1 = sequence[t - 1] if t - 1 >= 0 else 0
         if t - 1 >= 0:
             bi_chr = seq_chr[t-1]+seq_chr[t]
@@ -56,7 +56,7 @@ def build_dataset(config, ues_word):
         t2 = sequence[t - 2] if t - 2 >= 0 else 0
         return (t2 * 14918087 * 18408749 + t1 * 14918087) % buckets
 
-    def triGramVocab(seq, seq_chr, t, buckets):
+    def triGramVocab(sequence, seq_chr, t, buckets):
         t1 = sequence[t - 1] if t - 1 >= 0 else 0
         t2 = sequence[t - 2] if t - 2 >= 0 else 0
         if t - 2 >= 0:
